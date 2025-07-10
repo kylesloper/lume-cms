@@ -1,3 +1,39 @@
+    <script>
+     console.log("test log");
+
+  // Function to log form data on any input change
+  function logFormData(event) {
+    const form = event.currentTarget; // The <form> element
+    const formData = new FormData(form);
+    const data = {};
+
+    // Convert FormData to a plain object
+    for (let [key, value] of formData.entries()) {
+      // Handle multi-select or repeated fields (e.g., checkboxes with the same name)
+      if (key in data) {
+        if (Array.isArray(data[key])) {
+          data[key].push(value);
+        } else {
+          data[key] = [data[key], value];
+        }
+      } else {
+        data[key] = value;
+      }
+    }
+
+    console.log("Updated form data:", data);
+  }
+
+  // Set up the listener when the DOM is ready
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector("#form-edit");
+    
+    if (form) {
+      form.addEventListener("input", logFormData); // Listen for input events
+    }
+  });
+    </script>
+
 {{
   include "breadcrumb.vto" {
     version,
