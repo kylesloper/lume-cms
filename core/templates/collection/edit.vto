@@ -1,4 +1,14 @@
-    <script>
+{{
+  include "breadcrumb.vto" {
+    version,
+    links: [
+      [collection.label, ["collection", collection.name]],
+      "Editing file",
+    ],
+  }
+}}
+
+  <script defer async>
      console.log("test log");
 
   // Function to log form data on any input change
@@ -33,16 +43,6 @@
     }
   });
     </script>
-
-{{
-  include "breadcrumb.vto" {
-    version,
-    links: [
-      [collection.label, ["collection", collection.name]],
-      "Editing file",
-    ],
-  }
-}}
 
 <u-form>
   <header class="header">
