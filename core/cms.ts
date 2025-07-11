@@ -520,11 +520,9 @@ export default class Cms {
       if (resolvedField.type.endsWith("!")) {
         resolvedField.type = resolvedField.type.slice(0, -1);
         resolvedField.attributes = { required: true };
-        resolvedField.label = (resolvedField.label ?? labelify(resolvedField.name)) + " (required)"
       }
     } else {
       resolvedField = field;
-      resolvedField.label = resolvedField.label ?? labelify(resolvedField.name)
     }
 
     const type = this.fields.get(resolvedField.type);
@@ -535,6 +533,7 @@ export default class Cms {
 
     resolvedField = {
       tag: type.tag,
+      label: resolvedField.label ?? labelify(resolvedField.name),
       applyChanges: type.applyChanges,
       ...resolvedField,
     };
