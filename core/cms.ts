@@ -520,6 +520,7 @@ export default class Cms {
       if (resolvedField.type.endsWith("!")) {
         resolvedField.type = resolvedField.type.slice(0, -1);
         resolvedField.attributes = { required: true };
+        resolvedField.label = resolvedField.label + " (required)"
       }
     } else {
       resolvedField = field;
