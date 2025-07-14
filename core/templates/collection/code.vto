@@ -3,7 +3,7 @@
     version,
     links: [
       [collection.label, ["collection", collection.name]],
-      "Editing code",
+      "Editing " + (collection.labelSingular || "file") + " code",
     ],
   }
 }}
@@ -11,16 +11,16 @@
 <u-form>
   <header class="header">
     <h1 class="header-title">
-      Editing file
+      Editing {{ collection.labelSingular || "file" }} code
       <input
         class="input is-inline"
         id="_id"
         type="{{ collection.permissions.rename ? 'text' : 'hidden' }}"
         name="_id"
         value="{{document.name}}"
-        placeholder="Rename the file…"
+        placeholder='Rename this {{ collection.labelSingular || "file" }}'
         form="form-edit"
-        aria-label="File name"
+        aria-label='{{ collection.labelSingular || "file" }} name'
         {{
           if !collection.permissions.create || !collection.permissions.delete
         }}readonly{{ /if }}
