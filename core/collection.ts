@@ -5,6 +5,7 @@ import type { Data, EntryMetadata, Labelizer, Storage } from "../types.ts";
 export interface CollectionOptions {
   name: string;
   label?: string;
+  labelSingular?: string;
   description?: string;
   storage: Storage;
   fields: Lume.CMS.ResolvedField[];
@@ -26,6 +27,7 @@ interface Permissions {
 export default class Collection {
   name: string;
   label: string;
+  labelSingular?: string;
   description?: string;
   #storage: Storage;
   #fields: Lume.CMS.ResolvedField[];
@@ -38,6 +40,7 @@ export default class Collection {
   constructor(options: CollectionOptions) {
     this.name = options.name;
     this.label = options.label || options.name;
+    this.labelSingular = options.labelSingular;
     this.description = options.description;
     this.#storage = options.storage;
     this.#fields = options.fields;

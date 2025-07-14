@@ -115,8 +115,8 @@ export default function (app: Hono) {
         attributes: {
           data: {
             language: getLanguageCode(document.name),
-          }
-        }
+          },
+        },
       }];
       const data = { code };
 
