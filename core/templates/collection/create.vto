@@ -10,8 +10,8 @@
 
 <header class="header">
   <h1 class="header-title">
-    Creating new {{ collection.labelSingular || "file" }}
-    {{ if collection.documentName && collection.permissions.rename }}
+    Creating new file
+    {{ if !collection.documentName || !collection.permissions.rename }}
       <label class="header-file">
         {{ folder }}
         <input

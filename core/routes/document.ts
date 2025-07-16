@@ -1,9 +1,9 @@
-import { getPath } from "../utils/path.ts";
+import { getLanguageCode, getPath } from "../utils/path.ts";
 import { changesToData, getViews, prepareField } from "../utils/data.ts";
 import { render } from "../../deps/vento.ts";
 
 import type { Context, Hono } from "../../deps/hono.ts";
-import type { CMSContent } from "../../types.ts";
+import type { CMSContent, Data } from "../../types.ts";
 
 export default function (app: Hono) {
   app
@@ -14,7 +14,19 @@ export default function (app: Hono) {
         return c.notFound();
       }
 
-      const data = await document.read(true);
+      let data: Data;
+
+      try {
+        data = await document.read(true);
+      } catch (error) {
+        return c.render(
+          await render("document/edit-error.vto", {
+            error: (error as Error).message,
+            document,
+          }),
+        );
+      }
+
       const fields = await Promise.all(
         document.fields.map((field) => prepareField(field, options, data)),
       );
@@ -44,6 +56,54 @@ export default function (app: Hono) {
 
       await document.write(changesToData(body), options, true);
       return c.redirect(getPath(options.basePath, "document", document.name));
+    });
+
+  app
+    .get("/document/code/:document", async (c: Context) => {
+      const { document, versioning } = get(c);
+
+      if (!document) {
+        return c.notFound();
+      }
+
+      const code = await document.readText();
+      const fields = [{
+        tag: "f-code",
+        name: "code",
+        label: "Code",
+        type: "code",
+        attributes: {
+          data: {
+            language: getLanguageCode(document.name),
+          },
+        },
+      }];
+      const data = { code };
+
+      try {
+        return c.render(
+          await render("document/code.vto", {
+            fields,
+            data,
+            document,
+            version: versioning?.current(),
+          }),
+        );
+      } catch (e) {
+        console.error(e);
+        return c.notFound();
+      }
+    })
+    .post(async (c: Context) => {
+      const { options, document } = get(c);
+
+      const body = await c.req.parseBody();
+      const code = body["changes.code"] as string | undefined;
+      document.writeText(code ?? "");
+
+      return c.redirect(
+        getPath(options.basePath, "document", "code", document.name),
+      );
     });
 }
 
