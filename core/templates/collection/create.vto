@@ -47,7 +47,10 @@
   enctype="multipart/form-data"
   id="form-create"
 >
-  <input type="hidden" name="_prefix" value="{{ folder }}">
+  {{ if collection.autoAddPrefix }}
+    <input type="hidden" name="_prefix" value="{{ folder }}">
+  {{ /if }}
+
   <u-fields
     data-fields="{{ fields |> JSON.stringify |> escape }}"
     data-new="true"

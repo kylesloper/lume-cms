@@ -12,6 +12,7 @@ export interface CollectionOptions {
   views?: string[] | ((data?: Data) => string[] | undefined);
   documentName?: string | ((changes: Data) => string | undefined);
   documentLabel?: Labelizer;
+  autoAddPrefix?: boolean;
   create?: boolean;
   delete?: boolean;
   rename?: boolean | "auto";
@@ -32,6 +33,7 @@ export default class Collection {
   url?: string;
   views?: string[] | ((data?: Data) => string[] | undefined);
   documentName?: string | ((changes: Data) => string | undefined);
+  autoAddPrefix?: boolean;
   documentLabel?: Labelizer;
   permissions: Permissions;
 
@@ -45,6 +47,7 @@ export default class Collection {
     this.views = options.views;
     this.documentName = options.documentName;
     this.documentLabel = options.documentLabel;
+    this.autoAddPrefix = options.autoAddPrefix ?? true;
     this.permissions = {
       create: options.create ?? true,
       delete: options.delete ?? true,

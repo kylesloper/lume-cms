@@ -75,6 +75,7 @@ interface CollectionOptions {
   views?: string[] | ((data?: Data) => string[] | undefined);
   documentName?: string | ((changes: Data) => string | undefined);
   documentLabel?: Labelizer;
+  autoAddPrefix?: boolean;
   create?: boolean;
   delete?: boolean;
   rename?: boolean | "auto";
@@ -117,7 +118,9 @@ export default class Cms {
     this.options.root = normalizePath(this.options.root ?? Deno.cwd());
 
     // Set the .fetch method (https://github.com/denoland/deno/issues/24062)
-    let fetch: ((request: Request) => Response | Promise<Response>) | undefined;
+    let fetch:
+      | ((request: Request) => Response | Promise<Response>)
+      | undefined;
 
     this.fetch = (request: Request): Response | Promise<Response> => {
       if (!fetch) {
@@ -162,17 +165,17 @@ export default class Cms {
     publicPath?: string,
   ): this {
     const options: UploadOptions = typeof name === "string"
-      ? {
+      ? ({
         name,
         store,
         publicPath,
-      } as UploadOptions
+      } as UploadOptions)
       : name;
 
     if (!options.description) {
-      const [name, description] = options.name.split(":").map((part) =>
-        part.trim()
-      );
+      const [name, description] = options.name
+        .split(":")
+        .map((part) => part.trim());
       options.name = name;
       options.description = description;
     }
@@ -188,28 +191,24 @@ export default class Cms {
 
   /** Add a new collection */
   collection(options: CollectionOptions): this;
-  collection(
-    name: string,
-    store: string,
-    fields: Lume.CMS.Field[],
-  ): this;
+  collection(name: string, store: string, fields: Lume.CMS.Field[]): this;
   collection(
     name: string | CollectionOptions,
     store?: string,
     fields?: Lume.CMS.Field[],
   ): this {
     const options = typeof name === "string"
-      ? {
+      ? ({
         name,
         store,
         fields,
-      } as CollectionOptions
-      : name as CollectionOptions;
+      } as CollectionOptions)
+      : (name as CollectionOptions);
 
     if (!options.description) {
-      const [name, description] = options.name.split(":").map((part) =>
-        part.trim()
-      );
+      const [name, description] = options.name
+        .split(":")
+        .map((part) => part.trim());
       options.name = name;
       options.description = description;
     }
@@ -220,28 +219,24 @@ export default class Cms {
 
   /** Add a new document */
   document(options: DocumentOptions): this;
-  document(
-    name: string,
-    store: string,
-    fields: Lume.CMS.Field[],
-  ): this;
+  document(name: string, store: string, fields: Lume.CMS.Field[]): this;
   document(
     name: string | DocumentOptions,
     store?: string,
     fields?: Lume.CMS.Field[],
   ): this {
     const options = typeof name === "string"
-      ? {
+      ? ({
         name,
         store,
         fields,
-      } as DocumentOptions
-      : name as DocumentOptions;
+      } as DocumentOptions)
+      : (name as DocumentOptions);
 
     if (!options.description) {
-      const [name, description] = options.name.split(":").map((part) =>
-        part.trim()
-      );
+      const [name, description] = options.name
+        .split(":")
+        .map((part) => part.trim());
       options.name = name;
       options.description = description;
     }
@@ -250,10 +245,7 @@ export default class Cms {
     return this;
   }
 
-  field(
-    name: string,
-    field: FieldDefinition,
-  ): this {
+  field(name: string, field: FieldDefinition): this {
     this.fields.set(name, field);
     return this;
   }
@@ -281,9 +273,14 @@ export default class Cms {
     }
 
     for (
-      const { name, label, description, store, publicPath, listed } of this
-        .uploads
-        .values()
+      const {
+        name,
+        label,
+        description,
+        store,
+        publicPath,
+        listed,
+      } of this.uploads.values()
     ) {
       content.uploads[name] = new Upload({
         name,
@@ -296,9 +293,14 @@ export default class Cms {
     }
 
     for (
-      const { name, label, store, fields, documentLabel, ...options } of this
-        .collections
-        .values()
+      const {
+        name,
+        label,
+        store,
+        fields,
+        documentLabel,
+        ...options
+      } of this.collections.values()
     ) {
       content.collections[name] = new Collection({
         storage: this.#getStorage(store),
@@ -313,8 +315,13 @@ export default class Cms {
     }
 
     for (
-      const { name, label, store, fields, ...options } of this.documents
-        .values()
+      const {
+        name,
+        label,
+        store,
+        fields,
+        ...options
+      } of this.documents.values()
     ) {
       content.documents[name] = new Document({
         entry: this.#getEntry(store),
@@ -400,12 +407,14 @@ export default class Cms {
 
     app.use("*", (c: Context, next: Next) => {
       c.setRenderer(async (content) => {
-        return c.html(render("layout.vto", {
-          jsImports: Array.from(this.#jsImports),
-          extraHead: this.options.extraHead,
-          content: await content,
-          version: getCurrentVersion(),
-        }));
+        return c.html(
+          render("layout.vto", {
+            jsImports: Array.from(this.#jsImports),
+            extraHead: this.options.extraHead,
+            content: await content,
+            version: getCurrentVersion(),
+          }),
+        );
       });
       c.set("options", { ...content });
       return next();
@@ -445,7 +454,9 @@ export default class Cms {
             if (result) {
               const url = await result.url;
               if (url) {
-                socket.send(JSON.stringify({ type: "reload", src, url }));
+                socket.send(
+                  JSON.stringify({ type: "reload", src, url }),
+                );
               }
             }
           }
@@ -466,7 +477,9 @@ export default class Cms {
         serveStatic({
           root,
           rewriteRequestPath: (path: string) =>
-            normalizePath(path.substring(this.options.basePath.length)),
+            normalizePath(
+              path.substring(this.options.basePath.length),
+            ),
         }),
       );
     }
