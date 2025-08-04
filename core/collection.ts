@@ -37,6 +37,7 @@ export default class Collection {
   documentName?: string | ((changes: Data) => string | undefined);
   autoAddPrefix?: boolean;
   documentLabel?: Labelizer;
+  autoAddPrefix?: boolean;
   permissions: Permissions;
 
   constructor(options: CollectionOptions) {

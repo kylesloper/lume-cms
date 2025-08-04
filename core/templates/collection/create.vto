@@ -50,7 +50,6 @@
   {{ if collection.autoAddPrefix }}
     <input type="hidden" name="_prefix" value="{{ folder }}">
   {{ /if }}
-
   <u-fields
     data-fields="{{ fields |> JSON.stringify |> escape }}"
     data-new="true"
