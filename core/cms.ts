@@ -75,6 +75,7 @@ interface CollectionOptions {
   views?: string[] | ((data?: Data) => string[] | undefined);
   documentName?: string | ((changes: Data) => string | undefined);
   documentLabel?: Labelizer;
+  autoAddPrefix?: boolean;
   create?: boolean;
   delete?: boolean;
   rename?: boolean | "auto";
