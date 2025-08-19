@@ -28,6 +28,7 @@ import type { Context, Next } from "../deps/hono.ts";
 import type {
   CMSContent,
   Data,
+  DuplicationModifiers,
   Entry,
   FieldDefinition,
   Labelizer,
@@ -76,6 +77,7 @@ interface CollectionOptions {
   views?: string[] | ((data?: Data) => string[] | undefined);
   documentName?: string | ((changes: Data) => string | undefined);
   documentLabel?: Labelizer;
+  duplicationModifiers?: DuplicationModifiers[];
   autoAddPrefix?: boolean;
   create?: boolean;
   delete?: boolean;

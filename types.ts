@@ -5,6 +5,12 @@ import type Upload from "./core/upload.ts";
 /** Generic data to store */
 export type Data = Record<string, unknown>;
 
+export interface DuplicationModifiers {
+  field: string;
+  expression?: string;
+  value?: unknown;
+}
+
 export interface EntryMetadata {
   label: string;
   name: string;

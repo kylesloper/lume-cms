@@ -1,6 +1,12 @@
 import Document from "./document.ts";
 
-import type { Data, EntryMetadata, Labelizer, Storage } from "../types.ts";
+import type {
+  Data,
+  DuplicationModifiers,
+  EntryMetadata,
+  Labelizer,
+  Storage,
+} from "../types.ts";
 
 export interface CollectionOptions {
   name: string;
@@ -13,6 +19,7 @@ export interface CollectionOptions {
   views?: string[] | ((data?: Data) => string[] | undefined);
   documentName?: string | ((changes: Data) => string | undefined);
   documentLabel?: Labelizer;
+  duplicationModifiers?: DuplicationModifiers[];
   autoAddPrefix?: boolean;
   create?: boolean;
   delete?: boolean;
@@ -37,6 +44,7 @@ export default class Collection {
   documentName?: string | ((changes: Data) => string | undefined);
   autoAddPrefix?: boolean;
   documentLabel?: Labelizer;
+  duplicationModifiers?: DuplicationModifiers[];
   autoAddPrefix?: boolean;
   permissions: Permissions;
 
@@ -51,6 +59,7 @@ export default class Collection {
     this.views = options.views;
     this.documentName = options.documentName;
     this.documentLabel = options.documentLabel;
+    this.duplicationModifiers = options.duplicationModifiers;
     this.autoAddPrefix = options.autoAddPrefix ?? true;
     this.permissions = {
       create: options.create ?? true,
