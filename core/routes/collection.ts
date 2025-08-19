@@ -200,6 +200,23 @@ export default function (app: Hono) {
       );
     });
 
+  function setNestedProperty(
+    obj: Record<string, unknown>,
+    path: string,
+    value: unknown,
+  ) {
+    const keys = path.split(".");
+    let current = obj;
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i];
+      if (!current[key] || typeof current[key] !== "object") {
+        current[key] = {};
+      }
+      current = current[key] as Record<string, unknown>;
+    }
+    current[keys[keys.length - 1]] = value;
+  }
+
   app.post(
     "/collection/:collection/duplicate/:document",
     async (c: Context) => {
@@ -214,24 +231,68 @@ export default function (app: Hono) {
       }
 
       const body = await c.req.parseBody();
+
       let name = normalizeName(body._id as string);
 
       if (!name) {
         throw new Error("Document name is required");
       }
 
-      if (document.name === name) {
-        const ext = name.split(".").pop();
-        if (ext) {
-          name = name.substring(0, name.length - ext.length - 1) + "-copy." +
-            ext;
-        } else {
-          name = `${name}-copy`;
+      // Read the original document's data
+      const originalData = await document.read();
+
+      // Create a deep clone of the data to modify
+      const newData = structuredClone(originalData);
+      let newName = name;
+
+      // Process duplication modifiers if configured
+      if (collection.duplicationModifiers?.length) {
+        for (
+          const [index, modifier] of collection.duplicationModifiers.entries()
+        ) {
+          try {
+            const { field, expression, value } = modifier;
+
+            // VALUE PROPERTY TAKES PRIORITY
+            if (modifier.hasOwnProperty("value")) {
+              if (field === "name") {
+                newName = typeof value === "string" ? value : String(value);
+              } else {
+                setNestedProperty(newData, field, value);
+              }
+              continue; // Skip expression evaluation
+            }
+
+            // Fall back to expression if no value provided
+            if (expression) {
+              const evaluationFunction = new Function(
+                "name",
+                "data",
+                "document",
+                `return ${expression}`,
+              );
+
+              const result = evaluationFunction(newName, newData, document);
+
+              if (field === "name") {
+                newName = String(result);
+              } else {
+                setNestedProperty(newData, field, result);
+              }
+            }
+          } catch (error) {
+            throw new Error(
+              "Error processing duplication modifier: " + error,
+            );
+          }
         }
       }
+      // Ensure the new name is properly normalized
+      newName = normalizeName(newName) || newName;
 
-      const duplicate = collection.create(name);
-      await duplicate.write(changesToData(body), options, true);
+      const duplicate = collection.create(newName);
+
+      await duplicate.write(newData, options, true);
 
       return c.redirect(
         getPath(
