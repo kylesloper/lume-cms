@@ -45,7 +45,6 @@ export default class Collection {
   autoAddPrefix?: boolean;
   documentLabel?: Labelizer;
   duplicationModifiers?: DuplicationModifiers[];
-  autoAddPrefix?: boolean;
   permissions: Permissions;
 
   constructor(options: CollectionOptions) {
